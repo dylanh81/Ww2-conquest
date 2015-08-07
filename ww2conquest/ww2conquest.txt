@@ -1,0 +1,8 @@
+"ww2conquest"
+{
+     "base"    "base"
+     "title"   "ww2conquest"
+     "maps"    "^rnl_"
+     "version"  ""
+	 "menusystem"   "1"
+}
