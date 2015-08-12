@@ -1,15 +1,15 @@
- AddCSLuaFile( "cl_init.lua" )
- AddCSLuaFile( "shared.lua" )
- AddCSLuaFile( "player.lua" )
+AddCSLuaFile( "cl_init.lua" )
+AddCSLuaFile( "shared.lua" )
+AddCSLuaFile( "player.lua" )
+
+include( 'shared.lua' )
+include( 'player.lua' )
  
- include( 'shared.lua' )
- include( 'player.lua' )
- 
- -- This shit is for da playerzzz
- resource.AddFile("models/weapons/syndod/v_mp40.mdl")
+-- This shit is for da playerzzz
+resource.AddFile("models/weapons/syndod/v_mp40.mdl")
   
   
-  local TEAM_SPEC, TEAM_AXIS, TEAM_ALLIED = 1, 2, 3
+local TEAM_SPEC, TEAM_AXIS, TEAM_ALLIED = 1, 2, 3
 
 function GM:PlayerInitialSpawn( ply )
 
@@ -103,53 +103,7 @@ function GM:CanPlayerSuicide()
     return true
 end
 
-
-function GM:PlayerSelectSpawn( ply )
-    local spawns_allied
-	local spawn_axis
-	local i
-	if ply:Team() == TEAM_ALLIED then
-	    spawns_allied = ents.FindByClass( "spawnpoint_allied" )
-		i = math.random( #spawns_allied )
-		return spawns_axis[i]
-    end
-end
-
-
-function AddSpawnAllied( map, pos, ang )
-    timer.Simple( 3, function()
-	    if game.GetMap() == map then
-	        local crate = ents.Create( "spawnpoint_allied" )
-	        if not crate:IsValid() then return end
-	        crate:SetPos( pos )
-	        crate:SetAngles( ang )
-	        crate:Spawn()
-	        crate:DropToFloor()
-		end
-	end )
-end
-hook.Add("InitPostEntity", "AddSpawnAllied", AddSpawnAllied )
-
-function AddSpawnAxis( map, pos, ang )
-    timer.Simple( 3, function()
-	    if game.GetMap() == map then
-		    local crate = ents.Create( "spawnpoint_axis" )
-			if not crate:IsValid() then return end
-			crate:SetPos( pos )
-			crate:SetAngles( ang )
-			crate:Spawn()
-			crate:DropToFloor()
-		end
-	end )
-end
-hook.Add("InitPostEntity", "AddSpawnAxis", AddSpawnAxis )	
-
-resource.AddWorkshop( "104557094" )
-
-
-AddSpawnAxis( "gm_construct", Vector( -4354.668457, -982.966858, 320.031250 ), Angle( 0, 80, 0 ) )
-
-AddSpawnAllied( "gm_construct", Vector( -4377.547363, -3620.756592, 320.031250 ), Angle( 0, 90, 0 ) )
+--resource.AddWorkshop( "104557094" )
 
 function GM:PlayerSetModel( ply )
 	ply:SetModel( "models/player/kleiner.mdl" )
@@ -171,11 +125,17 @@ function RandomPlayerModel( ply )
  
 end
 
-function GM:PlayerSelectSpawn( pl )
-
-	local spawns = ents.FindByClass( "info_player_start" )
-	local random_entry = math.random( #spawns )
-
-	return spawns[ random_entry ]
-
+function GM:PlayerSelectSpawn( ply )
+	--you said you wanted spawns chosen by different sections, like you spawn closer when capturing
+	--use a variable to store what section (stage) the game is at
+	local plyTeam = ply:Team()
+	
+	local spawns = {}
+	for k,v in next,ents.FindByClass( "ww2c_player_spawn" ) do
+		if v.GetTeam == tostring( plyTeam ) --[[and v.Section == sectionVARIABLE]] then
+			table.insert( spawns, v )
+		end
+	end
+	
+	return #spawns != 0 and table.Random( spawns ) or table.Random( ents.FindByClass( "info_player_start" ) )
 end
