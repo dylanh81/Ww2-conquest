@@ -171,3 +171,11 @@ function RandomPlayerModel( ply )
  
 end
 
+function GM:PlayerSelectSpawn( pl )
+
+	local spawns = ents.FindByClass( "info_player_start" )
+	local random_entry = math.random( #spawns )
+
+	return spawns[ random_entry ]
+
+end
